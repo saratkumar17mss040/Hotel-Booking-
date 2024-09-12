@@ -1,7 +1,15 @@
-.vscode/settings.json
+# Node.js modules
 frontend/node_modules/
 backend/node_modules/
-backend/.env
-backend/.env.*
+
+# Environment files
 frontend/.env
 frontend/.env.*
+backend/.env
+backend/.env.*
+
+# Optional: Build outputs
+frontend/dist/
+backend/dist/
+
+.vscode/settings.json

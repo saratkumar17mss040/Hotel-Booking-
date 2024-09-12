@@ -95,4 +95,6 @@ install playwright extensions as well in vscode
 
 __dirname is a special variable provided by Node.js that helps you manage file paths relative to the module's directory. It is automatically set by Node.js for each module and is useful for constructing file paths and managing file locations in your application.
 
-since, we have moved 
+since, we are now serving the frontend files from backend, now frontend and backend will have the same url - generally in production, this is not recommended as everytime we do changes in frontend it needs to install, build and run the server and server takes time to load and serve these files on top of handling api requests.
+
+so, for next project we will keep it in separate urls 

@@ -2,7 +2,8 @@ import { RegisterFormDataType } from "./pages/Register";
 import { SignInFormDataType } from "./pages/SignIn";
 
 // this is how vite imports env vars
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+// import.meta.env.VITE_API_BASE_URL || '' ensures that API_BASE_URL has a fallback value of an empty string if the environment variable is not set.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 export const register = async (formData: RegisterFormDataType) => {
   try {
