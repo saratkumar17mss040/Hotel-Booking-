@@ -11,6 +11,8 @@ mongoose.connect(process.env.MONGODB_CONNECTION_STRING as string).then(() => {
   console.log("Connected to database: ", process.env.MONGODB_CONNECTION_STRING);
 });
 
+const port = process.env.BACKEND_PORT || 3000;
+
 const app = express();
 app.use(cookieParser());
 app.use(express.json());
@@ -37,6 +39,6 @@ app.use(express.static(path.join(__dirname, "../../frontend/dist")));
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 
-app.listen(3000, () => console.log("server started on port 3000"));
+app.listen(port, () => console.log("server started on port 3000"));
 
 export default app;

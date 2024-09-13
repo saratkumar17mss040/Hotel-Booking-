@@ -98,3 +98,13 @@ __dirname is a special variable provided by Node.js that helps you manage file p
 since, we are now serving the frontend files from backend, now frontend and backend will have the same url - generally in production, this is not recommended as everytime we do changes in frontend it needs to install, build and run the server and server takes time to load and serve these files on top of handling api requests.
 
 so, for next project we will keep it in separate urls 
+
+under network access in mongodb atlas please add your local computers ip address and also render web service ip address - static outbound ip address.
+it will enable access to db from local computer and also from render web service 
+
+this will allow all ip address to access it. for dev, you can add it. later on, remove it - 0.0.0.0/0
+will remove later - todo
+
+setting up env varible on render, we dont need frontend_url cuz, the server and fronend assets are coming same url only 
+// import.meta.env.VITE_API_BASE_URL || '' ensures that API_BASE_URL has a fallback value of an empty string if the environment variable is not set.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
