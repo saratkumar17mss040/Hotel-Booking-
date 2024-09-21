@@ -308,3 +308,17 @@ Multipart Request: By sending the FormData object, the Content-Type is automatic
 Conditionally rendered components are always included in the build, even if they are not rendered initially or based on certain conditions.
 The build process compiles all your JavaScript, CSS, and assets into static files (e.g., index.html, .js, .css), which the server then serves.
 Tree shaking removes completely unused code, but conditionally rendered components are considered "used" because they are part of the app logic.
+
+Currently, add hotel page is not a protected route - meaning it should be rendered only when user is logged in or else it should be
+redirected - currently this is not how it works - it is shown of both logged in and not logged in users. it is just that uploading is allowed only
+for logged in users - currenntly i have fixed isLogged protected paths to work like this
+
+const [isLoggedIn, setIsLoggedIn] = useState<boolean>(
+sessionStorage.getItem("isLoggedIn") === "true"
+);
+
+white-space: pre-line; does:
+
+Newlines (line breaks) in the source code are respected.
+Multiple spaces are collapsed into a single space.
+Text wrapping occurs when the text reaches the edge of its container.

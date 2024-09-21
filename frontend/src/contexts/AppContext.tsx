@@ -32,7 +32,9 @@ export const AppContextProvider = ({
   console.log("AppContext Provider render");
 
   const [toast, setToast] = useState<ToastMessageType | undefined>(undefined);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(
+    sessionStorage.getItem("isLoggedIn") === "true"
+  );
 
   // Check localStorage for initial login state
   useEffect(() => {

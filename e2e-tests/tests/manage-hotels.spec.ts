@@ -7,16 +7,6 @@ const UI_URL = "http://localhost:5173";
 test.beforeEach(async ({ page }) => {
   await page.goto(UI_URL);
 
-  // Start logging all network requests
-  page.on("request", (request) => {
-    console.log(">> Request:", request.url());
-  });
-
-  // Log all responses to check if they are being captured
-  page.on("response", (response) => {
-    console.log("<< Response:", response.url(), response.status());
-  });
-
   await page.getByRole("link", { name: "Sign In" }).click();
   await expect(page.getByRole("heading", { name: "Sign In" })).toBeVisible();
   await page.locator("[name=email]").fill("samaboy@gmail.com");
@@ -58,4 +48,32 @@ test("should allow user to add a hotel", async ({ page }) => {
   });
 
   await expect(page.getByText("Hotel saved !")).toBeVisible();
+});
+
+// Test name 1
+// Test des 1
+// , Test country 1
+// Luxury
+// $50 per night
+// 2 adults, 2 children
+// 2 Star Rating
+
+test("should display hotels", async ({ page }) => {
+  await page.goto(`${UI_URL}/my-hotels`);
+  // hotel name
+  await expect(page.getByText("Test name 1")).toBeVisible();
+  // hotel des
+  await expect(page.getByText("Test des 1")).toBeVisible();
+  // hotel country
+  await expect(page.getByText("Test country 1")).toBeVisible();
+  // hotel type
+  await expect(page.getByText("Luxury")).toBeVisible();
+  // hotel rate
+  await expect(page.getByText("$50 per night")).toBeVisible();
+  // hotel adult counts, child counts
+  await expect(page.getByText("2 adults, 2 children")).toBeVisible();
+  // hotel rating
+  await expect(page.getByText("2 Star Rating")).toBeVisible();
+
+  await expect(page.getByRole("link", { name: "View Details" }).first()).toBeVisible();
 });

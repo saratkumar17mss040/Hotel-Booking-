@@ -1,5 +1,6 @@
 import { RegisterFormDataType } from "./pages/Register";
 import { SignInFormDataType } from "./pages/SignIn";
+import { HotelType } from "../../backend/src/shared/types";
 
 // this is how vite imports env vars
 // import.meta.env.VITE_API_BASE_URL || '' ensures that API_BASE_URL has a fallback value of an empty string if the environment variable is not set.
@@ -105,4 +106,16 @@ export const addMyHotel = async (hotelFormData: FormData) => {
     console.error("Error during adding hotel", (error as Error).message);
     throw error;
   }
+};
+
+export const fetchMyHotels = async (): Promise<HotelType[]> => {
+  const response = await fetch(`${API_BASE_URL}/api/my-hotels`, {
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error("Error fetching details");
+  }
+
+  return response.json();
 };

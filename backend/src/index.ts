@@ -50,7 +50,6 @@ app.use("/api/my-hotels", myHotelRoutes);
 
 // This catch-all route ensures that any route,
 // whether directly accessed, refreshed, or navigated to, results in index.html being served, so React can handle the routing.
-
 app.get("*", (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
 });

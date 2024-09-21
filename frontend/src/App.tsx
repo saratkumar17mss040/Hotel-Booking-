@@ -11,6 +11,7 @@ import SignIn from "./pages/SignIn";
 import AddHotel from "./pages/AddHotel";
 import { useAppContext } from "./contexts/AppContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import MyHotels from "./pages/MyHotels";
 
 function App() {
   const { isLoggedIn } = useAppContext();
@@ -51,16 +52,36 @@ function App() {
             </Layout>
           }
         />
-        <Route
+
+        {/* <Route
           path="/add-hotel"
           element={
             <Layout>
-              {/* <ProtectedRoute> */}
-              <AddHotel />
-              {/* </ProtectedRoute> */}
+                <AddHotel />
             </Layout>
           }
-        />
+        /> */}
+
+        {isLoggedIn && (
+          <>
+            <Route
+              path="/add-hotel"
+              element={
+                <Layout>
+                  <AddHotel />
+                </Layout>
+              }
+            />
+            <Route
+              path="/my-hotels"
+              element={
+                <Layout>
+                  <MyHotels />
+                </Layout>
+              }
+            />
+          </>
+        )}
         {/* catch all route should be last. they work in the order they are defined */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
