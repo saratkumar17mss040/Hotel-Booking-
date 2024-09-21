@@ -4,8 +4,13 @@ import "dotenv/config";
 import mongoose from "mongoose";
 import userRoutes from "./routes/users";
 import authRoutes from "./routes/auth";
+import myHotelRoutes from "./routes/my-hotels";
 import cookieParser from "cookie-parser";
 import path from "path";
+import configureExternalServices from "./config";
+
+// Initialize all external services
+configureExternalServices();
 
 mongoose.connect(process.env.MONGODB_CONNECTION_STRING as string).then(() => {
   console.log("Connected to database: ", process.env.MONGODB_CONNECTION_STRING);
@@ -24,12 +29,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
-    credentials: false,
+    credentials: true,
   })
 );
 
 // using express.static middleware, we are serving the entire frontend static asset
-// much similar to how we serve api endpoints 
+// much similar to how we serve api endpoints
 app.use(express.static(path.join(__dirname, "../../frontend/dist")));
 
 // app.get("/api/test", async (req: Request, res: Response) => {
@@ -38,6 +43,17 @@ app.use(express.static(path.join(__dirname, "../../frontend/dist")));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/my-hotels", myHotelRoutes);
+
+// Catch all route apart from above routes - this is added so that, dynamic protected routes can be served - tt's necessary as in build itself
+// all components will be bundled, even if conditional components are there.
+
+// This catch-all route ensures that any route,
+// whether directly accessed, refreshed, or navigated to, results in index.html being served, so React can handle the routing.
+
+app.get("*", (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
+});
 
 app.listen(port, () => console.log("server started on port 3000"));
 

@@ -16,8 +16,11 @@
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+
+    /* Disable TypeScript's unused variable checks. As i have eslint in vscode as extension, that will give me warnings */
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src"]

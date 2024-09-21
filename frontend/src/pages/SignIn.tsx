@@ -1,7 +1,6 @@
 import { useForm } from "react-hook-form";
 import * as apiClient from "../api-client";
-import { useMutation } from "react-query";
-import { useLoginContext } from "../contexts/LoginContext";
+import { useMutation, useQueryClient } from "react-query";
 import { useAppContext } from "../contexts/AppContext";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -17,16 +16,18 @@ export default function SignIn() {
     formState: { errors },
   } = useForm<SignInFormDataType>();
 
-  const { showToast } = useAppContext();
+  const { showToast, setIsLoggedIn } = useAppContext();
   const navigate = useNavigate();
-  const { setIsLoggedIn } = useLoginContext();
+  const queryClient = useQueryClient();
 
   const mutation = useMutation(apiClient.signIn, {
     onSuccess: async () => {
       console.log("user has been signed in");
-      setIsLoggedIn(true);
+      // await queryClient.invalidateQueries("validateToken");
       // show the toast
       showToast({ type: "SUCCESS", message: "Sign in successful !" });
+      setIsLoggedIn(true);
+      sessionStorage.setItem("isLoggedIn", "true");
       // navigate to home page
       navigate("/");
     },
@@ -34,6 +35,8 @@ export default function SignIn() {
       // show the toast
       console.error("Error during sign-in:", error);
       showToast({ type: "ERROR", message: "Sign in failed" });
+      setIsLoggedIn(false);
+      sessionStorage.setItem("isLoggedIn", "false");
     },
   });
 
@@ -45,7 +48,6 @@ export default function SignIn() {
   return (
     <form className="flex flex-col gap-5" onSubmit={onSubmit}>
       <h2 className="text-3xl font-bold">Sign In</h2>
-
       <label htmlFor="email" className="text-gray-700 text-sm font-bold flex-1">
         Email
         <input
@@ -81,7 +83,10 @@ export default function SignIn() {
       </label>
       <span className="flex items-center justify-between">
         <span className="text-sm">
-          Not Registered ? <Link className="underline" to="/register">Create an account here</Link>
+          Not Registered ?{" "}
+          <Link className="underline" to="/register">
+            Create an account here
+          </Link>
         </span>
         <button
           type="submit"

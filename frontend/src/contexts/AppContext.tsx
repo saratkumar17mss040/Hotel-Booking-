@@ -1,5 +1,13 @@
-import React, { useContext } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import Toast from "../components/Toast";
+import { useQuery } from "react-query";
+import * as apiClient from "../api-client";
 
 type ToastMessageType = {
   message: string;
@@ -8,6 +16,8 @@ type ToastMessageType = {
 
 type AppContextType = {
   showToast: (toastMessage: ToastMessageType) => void;
+  isLoggedIn: boolean | undefined;
+  setIsLoggedIn: (isLoggedIn: boolean) => void;
 };
 
 const AppContext = React.createContext<AppContextType | undefined>(undefined);
@@ -19,17 +29,61 @@ export const AppContextProvider = ({
 }: {
   children: childrenType;
 }) => {
-  const [toast, setToast] = React.useState<ToastMessageType | undefined>(
-    undefined
+  console.log("AppContext Provider render");
+
+  const [toast, setToast] = useState<ToastMessageType | undefined>(undefined);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+
+  // Check localStorage for initial login state
+  useEffect(() => {
+    const storedIsLoggedIn = sessionStorage.getItem("isLoggedIn");
+    if (storedIsLoggedIn !== null) {
+      setIsLoggedIn(storedIsLoggedIn === "true");
+    }
+  }, []);
+
+  useEffect(() => {
+    console.log("isLoggedIn value changed:", isLoggedIn);
+  }, [isLoggedIn]);
+
+  const { isError, isLoading } = useQuery(
+    "validateToken",
+    apiClient.validateToken,
+    {
+      retry: false,
+      enabled: isLoggedIn === true,
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      cacheTime: 1000 * 60 * 10, // 10 minutes
+      onSuccess: () => {
+        // Update `isLoggedIn` and localStorage on successful validation
+        console.log("success");
+        setIsLoggedIn(true);
+        sessionStorage.setItem("isLoggedIn", "true");
+      },
+      onError: () => {
+        // Update `isLoggedIn` and localStorage on failed validation
+        console.log("failed");
+        setIsLoggedIn(false);
+        sessionStorage.removeItem("isLoggedIn");
+      },
+    }
   );
+
+  const showToast = useCallback((toastMessage: ToastMessageType) => {
+    setToast(toastMessage);
+  }, []);
+
+  const contextValue = useMemo(
+    () => ({
+      showToast,
+      isLoggedIn,
+      setIsLoggedIn,
+    }),
+    [showToast, isLoggedIn, setIsLoggedIn] // Dependencies
+  );
+
   return (
-    <AppContext.Provider
-      value={{
-        showToast: (toastMessage) => {
-          setToast(toastMessage);
-        },
-      }}
-    >
+    <AppContext.Provider value={contextValue}>
       {toast && (
         <Toast
           message={toast.message}

@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
-import { useLoginContext } from "../contexts/LoginContext";
 import SignOutButton from "./SignOutButton";
+import { useAppContext } from "../contexts/AppContext";
 
 export default function Header() {
-  const { isLoggedIn } = useLoginContext();
+  const { isLoggedIn } = useAppContext();
   return (
     <div className="bg-blue-800 py-6">
       <div className="container mx-auto flex justify-between">

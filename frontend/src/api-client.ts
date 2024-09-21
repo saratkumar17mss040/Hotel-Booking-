@@ -3,7 +3,7 @@ import { SignInFormDataType } from "./pages/SignIn";
 
 // this is how vite imports env vars
 // import.meta.env.VITE_API_BASE_URL || '' ensures that API_BASE_URL has a fallback value of an empty string if the environment variable is not set.
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
 export const register = async (formData: RegisterFormDataType) => {
   try {
@@ -54,6 +54,7 @@ export const signIn = async (formData: SignInFormDataType) => {
 };
 
 export const validateToken = async () => {
+  console.log("validate token");
   try {
     const response = await fetch(`${API_BASE_URL}/api/auth/validate-token`, {
       credentials: "include",
@@ -82,6 +83,26 @@ export const signOut = async () => {
     console.log("Signed out successfully");
   } catch (error) {
     console.error("Error during sign-out: ", (error as Error).message);
+    throw error;
+  }
+};
+
+export const addMyHotel = async (hotelFormData: FormData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/my-hotels`, {
+      method: "POST",
+      credentials: "include",
+      body: hotelFormData,
+    });
+
+    console.log(response.ok);
+
+    if (!response.ok) {
+      throw new Error("Error during adding hotel");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error during adding hotel", (error as Error).message);
     throw error;
   }
 };

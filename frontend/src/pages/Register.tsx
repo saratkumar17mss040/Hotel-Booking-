@@ -1,9 +1,8 @@
 import { useForm } from "react-hook-form";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import * as apiClient from "../api-client";
 import { useAppContext } from "../contexts/AppContext";
 import { useNavigate } from "react-router-dom";
-import { useLoginContext } from "../contexts/LoginContext";
 
 export type RegisterFormDataType = {
   firstName: string;
@@ -14,9 +13,9 @@ export type RegisterFormDataType = {
 };
 
 export default function Register() {
+  // const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { showToast } = useAppContext();
-  const { setIsLoggedIn } = useLoginContext();
+  const { showToast, setIsLoggedIn } = useAppContext();
   const {
     register,
     watch,
@@ -25,11 +24,12 @@ export default function Register() {
   } = useForm<RegisterFormDataType>();
 
   const mutation = useMutation(apiClient.register, {
-    onSuccess: () => {
+    onSuccess: async () => {
       // these two will run at the same time, because we have placed the data in the context
       // we will see the toast even as the page transistion to home page
-      setIsLoggedIn(true);
       showToast({ type: "SUCCESS", message: "Registration successful !" });
+      setIsLoggedIn(true);
+      sessionStorage.setItem("isLoggedIn", "true");
       navigate("/");
     },
     onError: (error: Error) => {
