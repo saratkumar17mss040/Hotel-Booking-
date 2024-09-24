@@ -59,14 +59,18 @@ export const AppContextProvider = ({
       onSuccess: () => {
         // Update `isLoggedIn` and localStorage on successful validation
         console.log("success");
-        setIsLoggedIn(true);
-        sessionStorage.setItem("isLoggedIn", "true");
+        if (!isLoggedIn) {
+          setIsLoggedIn(true);
+          sessionStorage.setItem("isLoggedIn", "true");
+        }
       },
-      onError: () => {
+      onError: (error) => {
         // Update `isLoggedIn` and localStorage on failed validation
-        console.log("failed");
-        setIsLoggedIn(false);
-        sessionStorage.removeItem("isLoggedIn");
+        console.log("failed", error);
+        if (isLoggedIn) {
+          setIsLoggedIn(false);
+          sessionStorage.removeItem("isLoggedIn");
+        }
       },
     }
   );

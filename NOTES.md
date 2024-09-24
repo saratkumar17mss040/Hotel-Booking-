@@ -322,3 +322,5 @@ white-space: pre-line; does:
 Newlines (line breaks) in the source code are respected.
 Multiple spaces are collapsed into a single space.
 Text wrapping occurs when the text reaches the edge of its container.
+
+before using react-query, we need to learn it good enough to start with any project as it involves fetching and dealing with server state.

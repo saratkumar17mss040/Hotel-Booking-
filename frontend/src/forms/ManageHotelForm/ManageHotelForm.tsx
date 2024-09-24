@@ -4,6 +4,8 @@ import TypeSection from "./TypeSection";
 import FacilitiesSection from "./FacilitiesSection";
 import GuestsSection from "./GuestsSection";
 import ImagesSection from "./ImagesSection";
+import { HotelType } from "../../../../backend/src/shared/types";
+import { useEffect } from "react";
 
 export type HotelFormDataType = {
   name: string;
@@ -15,23 +17,35 @@ export type HotelFormDataType = {
   starRating: number;
   facilities: string[];
   imageFiles: FileList;
+  imageURLS: string[];
   adultCount: number;
   childCount: number;
 };
 
 type Props = {
+  hotel?: HotelType;
   onSave: (hotelFormData: FormData) => void;
   isLoading: boolean;
 };
 
-export default function ManageHotelForm({ onSave, isLoading }: Props) {
+export default function ManageHotelForm({ onSave, isLoading, hotel }: Props) {
   const formMethods = useForm<HotelFormDataType>();
-  const { handleSubmit } = formMethods;
+  const { handleSubmit, reset } = formMethods;
+
+  useEffect(() => {
+    if (hotel) {
+      console.log(hotel);
+      reset(hotel);
+    }
+  }, [hotel, reset]);
 
   const onSubmit = handleSubmit((formData: HotelFormDataType) => {
     // create new formData object & call the api
     console.log(formData);
     const formDataObj = new FormData();
+    if (hotel) {
+      formDataObj.append("hotelId", hotel._id);
+    }
     formDataObj.append("name", formData.name);
     formDataObj.append("city", formData.city);
     formDataObj.append("country", formData.country);
@@ -45,6 +59,12 @@ export default function ManageHotelForm({ onSave, isLoading }: Props) {
     formData.facilities.forEach((facility, index) => {
       formDataObj.append(`facilities[${index}]`, facility);
     });
+
+    if (formData.imageURLS) {
+      formData.imageURLS.forEach((url, index) => {
+        formDataObj.append(`imageURLS[${index}]`, url);
+      });
+    }
 
     Array.from(formData.imageFiles).forEach((imageFile) => {
       // as imageFiles are binary, we can just keep on appending, multer package on backend wil take care of it

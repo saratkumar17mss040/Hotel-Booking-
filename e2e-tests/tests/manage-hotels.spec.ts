@@ -50,30 +50,42 @@ test("should allow user to add a hotel", async ({ page }) => {
   await expect(page.getByText("Hotel saved !")).toBeVisible();
 });
 
-// Test name 1
-// Test des 1
-// , Test country 1
-// Luxury
-// $50 per night
-// 2 adults, 2 children
-// 2 Star Rating
-
 test("should display hotels", async ({ page }) => {
   await page.goto(`${UI_URL}/my-hotels`);
   // hotel name
-  await expect(page.getByText("Test name 1")).toBeVisible();
+  await expect(page.getByText("Test hotel").first()).toBeVisible();
   // hotel des
-  await expect(page.getByText("Test des 1")).toBeVisible();
+  await expect(page.getByText("Test city").first()).toBeVisible();
   // hotel country
-  await expect(page.getByText("Test country 1")).toBeVisible();
+  await expect(page.getByText("Test country").first()).toBeVisible();
   // hotel type
-  await expect(page.getByText("Luxury")).toBeVisible();
+  await expect(page.getByText("Test description").first()).toBeVisible();
   // hotel rate
-  await expect(page.getByText("$50 per night")).toBeVisible();
+  await expect(page.getByText("$100 per night").first()).toBeVisible();
   // hotel adult counts, child counts
-  await expect(page.getByText("2 adults, 2 children")).toBeVisible();
+  await expect(page.getByText("2 adults, 4 children").first()).toBeVisible();
   // hotel rating
-  await expect(page.getByText("2 Star Rating")).toBeVisible();
+  await expect(page.getByText("3 Star Rating").first()).toBeVisible();
 
-  await expect(page.getByRole("link", { name: "View Details" }).first()).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "View Details" }).first()
+  ).toBeVisible();
+});
+
+test("should edit hotel", async ({ page }) => {
+  await page.goto(`${UI_URL}/my-hotels`);
+  await page.getByRole("link", { name: "View Details" }).first().click();
+  await page.waitForSelector('[name="name"]', { state: "attached" });
+  // this data is hard-coded, for it to work on second run, we need update the field value in ui manually
+  // instead, we are resetting using the code below
+  await expect(page.locator('[name="name"]')).toHaveValue("Test hotel");
+  await page.locator('[name="name"]').fill("Test hotel updated");
+  await page.getByRole("button", { name: "Save" }).click();
+  await expect(page.getByText("Hotel saved!")).toBeVisible();
+
+  await page.reload();
+
+  await expect(page.locator('[name="name"]')).toHaveValue("Test hotel updated");
+  await page.locator('[name="name"]').fill("Test hotel");
+  await page.getByRole("button", { name: "Save" }).click();
 });
