@@ -1,9 +1,14 @@
 import { RegisterFormDataType } from "./pages/Register";
 import { SignInFormDataType } from "./pages/SignIn";
-import { HotelType } from "../../backend/src/shared/types";
+import {
+  HotelSearchResponseType,
+  HotelType,
+} from "../../backend/src/shared/types";
 
 // this is how vite imports env vars
 // import.meta.env.VITE_API_BASE_URL || '' ensures that API_BASE_URL has a fallback value of an empty string if the environment variable is not set.
+// initally, the frontend and backend was in different URLS, now since the backend bundles and serves the static assets of frontend - they will both be in the
+// same URL. for handling dynamic routes - we have added catch all route in the server at the end
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
 export const register = async (formData: RegisterFormDataType) => {
@@ -158,6 +163,56 @@ export const updateMyHotelById = async (hotelFormData: FormData) => {
     return response.json();
   } catch (error) {
     console.error("Failed to update Hotel by id", (error as Error).message);
+    throw error;
+  }
+};
+
+export type SearchParamsType = {
+  destination: string;
+  checkIn?: string;
+  checkOut?: string;
+  adultCount?: string;
+  childCount?: string;
+  page?: string;
+  types?: string[];
+  facilities?: string[];
+  stars?: string[];
+  maxPrice?: string;
+  sortOption?: string;
+};
+
+export const searchHotels = async (
+  searchParams: SearchParamsType
+): Promise<HotelSearchResponseType> => {
+  try {
+    const queryParams = new URLSearchParams();
+    queryParams.append("destination", searchParams.destination || "");
+    queryParams.append("checkIn", searchParams.checkIn || "");
+    queryParams.append("checkOut", searchParams.checkOut || "");
+    queryParams.append("adultCount", searchParams.adultCount || "");
+    queryParams.append("childCount", searchParams.childCount || "");
+    queryParams.append("page", searchParams.page || "");
+
+    queryParams.append("maxPrice", searchParams.maxPrice || "");
+    queryParams.append("sortOption", searchParams.sortOption || "");
+
+    searchParams.facilities?.forEach((facility) =>
+      queryParams.append("facilities", facility)
+    );
+
+    searchParams.types?.forEach((type) => queryParams.append("types", type));
+    searchParams.stars?.forEach((star) => queryParams.append("stars", star));
+
+    const response = await fetch(
+      `${API_BASE_URL}/api/hotels/search?${queryParams}`
+    );
+
+    if (!response.ok) {
+      throw new Error("Error searching and fetching hotels");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Failed to search hotel", (error as Error).message);
     throw error;
   }
 };

@@ -198,7 +198,9 @@ but it is subjective
 
 have used json-server for mocking api - for better dynamic mocking and more control over mock api - we will use miragejs next time
 
-while rendering any list of items - the author was not adding key prop, which is important - so we will add it with data that it supplied for now. generally, unique ids are added - so next time when modeling data. keep that in mind.
+while rendering any list of items - the author was not adding key prop, which is important - so we will add it with data that it supplied for now. generally, unique ids are added - so next time when modeling data. keep that in mind. - I have added it in bunch of components.
+
+we will also try to use runtime validation lib like yup, joi, zod for the next project
 
 In frontend, we have added this rule:
 
@@ -324,3 +326,31 @@ Multiple spaces are collapsed into a single space.
 Text wrapping occurs when the text reaches the edge of its container.
 
 before using react-query, we need to learn it good enough to start with any project as it involves fetching and dealing with server state.
+
+In the below code, the type name is SearchContextType, but
+the author named it as SearchContext similar to const SearchContext name
+it seems no issue having type name and var name same as types are used only at compile-time, but for my naming convention i will suffix with Type
+
+type SearchContextType = {
+destination: string;
+checkIn: Date;
+checkOut: Date;
+adultCount: number;
+childCount: number;
+hotelId: string;
+saveSearchValues: (
+destination: string,
+checkIn: Date,
+checkOut: Date,
+adultCount: number,
+childCount: number
+) => void;
+};
+
+const SearchContext = React.createContext<SearchContextType | undefined>(
+undefined
+);
+
+
+
+
