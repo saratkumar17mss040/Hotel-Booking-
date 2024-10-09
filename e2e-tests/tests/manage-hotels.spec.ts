@@ -78,7 +78,7 @@ test("should edit hotel", async ({ page }) => {
   await page.waitForSelector('[name="name"]', { state: "attached" });
   // this data is hard-coded, for it to work on second run, we need update the field value in ui manually
   // instead, we are resetting using the code below
-  await expect(page.locator('[name="name"]')).toHaveValue("Test hotel");
+  await expect(page.locator('[name="name"]')).toHaveValue("Samup");
   await page.locator('[name="name"]').fill("Test hotel updated");
   await page.getByRole("button", { name: "Save" }).click();
   await expect(page.getByText("Hotel saved!")).toBeVisible();

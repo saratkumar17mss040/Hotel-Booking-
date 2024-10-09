@@ -14,7 +14,9 @@ export default function SearchBar() {
   const [adultCount, setAdultCount] = useState<number>(search.adultCount);
   const [childCount, setChildCount] = useState<number>(search.childCount);
 
-  const handleSubmit = (event: FormEvent) => {
+  const handleSubmit = (event: FormEvent
+    
+  ) => {
     event.preventDefault();
     search.saveSearchValues(
       destination,

@@ -32,7 +32,6 @@ export const register = async (formData: RegisterFormDataType) => {
     console.log("Registration successful: ", responseBody);
   } catch (error) {
     console.error("Error during registration: ", (error as Error).message);
-    throw error;
   }
 };
 
@@ -55,7 +54,6 @@ export const signIn = async (formData: SignInFormDataType) => {
     return responseBody;
   } catch (error) {
     console.error("Error during sign-in: ", (error as Error).message);
-    throw error;
   }
 };
 
@@ -72,7 +70,6 @@ export const validateToken = async () => {
     console.log("Validated token successfully");
   } catch (error) {
     console.error("Error during validating token: ", (error as Error).message);
-    throw error;
   }
 };
 
@@ -89,7 +86,6 @@ export const signOut = async () => {
     console.log("Signed out successfully");
   } catch (error) {
     console.error("Error during sign-out: ", (error as Error).message);
-    throw error;
   }
 };
 
@@ -109,7 +105,6 @@ export const addMyHotel = async (hotelFormData: FormData) => {
     return response.json();
   } catch (error) {
     console.error("Error during adding hotel", (error as Error).message);
-    throw error;
   }
 };
 
@@ -130,7 +125,7 @@ export const fetchMyHotels = async (): Promise<HotelType[]> => {
   }
 };
 
-export const fetchMyHotelById = async (hotelId: string) => {
+export const fetchMyHotelById = async (hotelId: string): Promise<HotelType> => {
   try {
     const response = await fetch(`${API_BASE_URL}/api/my-hotels/${hotelId}`, {
       credentials: "include",
@@ -211,6 +206,18 @@ export const searchHotels = async (
       throw new Error("Error searching and fetching hotels");
     }
     return response.json();
+  } catch (error) {
+    console.error("Failed to search hotel", (error as Error).message);
+    throw error;
+  }
+};
+
+export const fetchHotelById = async (hotelId: string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/hotels/${hotelId}`);
+    if (!response.ok) {
+      throw new Error("Error fetching Hotel");
+    }
   } catch (error) {
     console.error("Failed to search hotel", (error as Error).message);
     throw error;

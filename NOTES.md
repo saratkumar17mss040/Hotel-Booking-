@@ -351,6 +351,11 @@ const SearchContext = React.createContext<SearchContextType | undefined>(
 undefined
 );
 
+You’re not seeing a TypeScript error because TypeScript allows functions returning promises to either resolve (with the expected type) or reject (with an error).
+A rejected Promise doesn’t need to match the return type (HotelType[]); it simply carries the error, and this behavior is understood by the type system. Eg: api-client.ts -> fetchMyHotels function
+
+basically, we can see view more hotel details page only when signed in.
+if signed in, the button will show - book or sign in to book. but sign-in to book wont work as it is inconsistent, because the on re-rendering the hotel details page the verifyToken will be unauthorized after signing out.
 
 
 
