@@ -36,6 +36,16 @@ npx tailwindcss init -p - it is used to initialize tailwind config
 
 Frontend library uses:
 
+npm i --save @stripe/react-stripe-js @stripe/stripe-js
+
+Together, the React components manage UI and handle user inputs, while the Stripe.js library provides methods and objects for securely communicating with Stripe’s payment infrastructure.
+
+Example Flow:
+User enters payment details into a CardElement (provided by @stripe/react-stripe-js).
+The frontend interacts with Stripe.js to create a PaymentIntent or confirm payment, using methods from @stripe/stripe-js.
+The payment is processed securely by Stripe, and the result is returned to your frontend.
+This way, you handle both UI elements and payment processing without exposing sensitive data to your own backend.
+
 Frontend Config docs:
 
 in tailwind.config.js
@@ -357,5 +367,31 @@ A rejected Promise doesn’t need to match the return type (HotelType[]); it sim
 basically, we can see view more hotel details page only when signed in.
 if signed in, the button will show - book or sign in to book. but sign-in to book wont work as it is inconsistent, because the on re-rendering the hotel details page the verifyToken will be unauthorized after signing out.
 
+The sequence of API calls from the frontend, along with when the next call occurs, works as follows:
 
+1. First Call: POST /api/hotels/:hotelId/bookings/payment-intent
 
+Trigger: This call is triggered when the customer is ready to make a payment (e.g., after clicking the "Book Now" button).
+Purpose: To calculate the total cost of the booking and create a Stripe PaymentIntent.
+Response: The backend returns a clientSecret from Stripe, which the frontend will use to process the payment.
+Next Step: After receiving the clientSecret, the frontend uses Stripe.js to handle the actual payment. Once the payment is confirmed (stripe.confirmCardPayment()), the frontend proceeds to the next API call to finalize the booking.
+
+2. Second Call: POST /api/hotels/:hotelId/bookings
+
+Trigger: This call is triggered after the frontend successfully confirms the payment via Stripe.
+Purpose: The backend verifies the payment status using the paymentIntentId and metadata to ensure the payment was successful and matches the correct hotel and user.
+Response: If the payment is verified (i.e., the PaymentIntent status is "succeeded"), the backend stores the booking details in the database. A success response is sent back to the frontend.
+Flow of Events:
+The frontend calls POST /bookings/payment-intent to get the clientSecret.
+After confirming the payment with Stripe using the clientSecret, the frontend calls POST /bookings to complete the booking process.
+Let me know if you need more clarification or have specific implementation questions!
+
+stripe api endpoints fields are not validated, we can validate for further improvement avoiding malformed data type.
+
+Test card no for stripe payment check:
+4242424242424242 - US
+
+when designing a mongodb database, we will design it carefully
+to include all the fields initially, but in all case as features comes on we will add it, before that we need to take back up and then migrate, 
+and then work on code, test and then deploy with migrated data.
+ 

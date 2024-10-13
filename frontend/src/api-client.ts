@@ -3,13 +3,27 @@ import { SignInFormDataType } from "./pages/SignIn";
 import {
   HotelSearchResponseType,
   HotelType,
+  PaymentIntentResponseType,
+  UserType,
 } from "../../backend/src/shared/types";
+import { BookingFormDataType } from "./forms/BookingForm/BookingForm";
 
 // this is how vite imports env vars
 // import.meta.env.VITE_API_BASE_URL || '' ensures that API_BASE_URL has a fallback value of an empty string if the environment variable is not set.
 // initally, the frontend and backend was in different URLS, now since the backend bundles and serves the static assets of frontend - they will both be in the
 // same URL. for handling dynamic routes - we have added catch all route in the server at the end
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+
+export const fetchCurrentUser = async (): Promise<UserType> => {
+  const response = await fetch(`${API_BASE_URL}/api/users/me`, {
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error("Error fetching user");
+  }
+  return response.json();
+};
 
 export const register = async (formData: RegisterFormDataType) => {
   try {
@@ -221,5 +235,46 @@ export const fetchHotelById = async (hotelId: string) => {
   } catch (error) {
     console.error("Failed to search hotel", (error as Error).message);
     throw error;
+  }
+};
+
+export const createPaymentIntent = async (
+  hotelId: string,
+  numberOfNights: string
+): Promise<PaymentIntentResponseType> => {
+  const response = await fetch(
+    `${API_BASE_URL}/api/hotels/${hotelId}/bookings/payment-intent`,
+    {
+      credentials: "include",
+      method: "POST",
+      body: JSON.stringify({ numberOfNights }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Error fetching payment intent");
+  }
+
+  return response.json();
+};
+
+export const createRoomBooking = async (formData: BookingFormDataType) => {
+  const response = await fetch(
+    `${API_BASE_URL}/api/hotels/${formData.hotelId}/bookings`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(formData),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Error booking room");
   }
 };

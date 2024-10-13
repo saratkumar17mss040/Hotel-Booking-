@@ -8,6 +8,9 @@ import React, {
 import Toast from "../components/Toast";
 import { useQuery } from "react-query";
 import * as apiClient from "../api-client";
+import { loadStripe, Stripe } from "@stripe/stripe-js";
+
+const STRIPE_PUB_KEY = import.meta.env.VITE_STRIPE_PUB_KEY || "";
 
 type ToastMessageType = {
   message: string;
@@ -18,9 +21,12 @@ type AppContextType = {
   showToast: (toastMessage: ToastMessageType) => void;
   isLoggedIn: boolean | undefined;
   setIsLoggedIn: (isLoggedIn: boolean) => void;
+  stripePromise: Promise<Stripe | null>;
 };
 
 const AppContext = React.createContext<AppContextType | undefined>(undefined);
+
+const stripePromise = loadStripe(STRIPE_PUB_KEY);
 
 type childrenType = React.ReactNode;
 
@@ -84,6 +90,8 @@ export const AppContextProvider = ({
       showToast,
       isLoggedIn,
       setIsLoggedIn,
+      // stripePromise is outside of react component, so no need to add it as dep
+      stripePromise,
     }),
     [showToast, isLoggedIn, setIsLoggedIn] // Dependencies
   );

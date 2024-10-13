@@ -1,7 +1,11 @@
 import express, { Request, Response } from "express";
 import Hotel from "../models/hotel";
-import { HotelSearchResponseType } from "../shared/types";
+import { BookingType, HotelSearchResponseType } from "../shared/types";
 import { param, validationResult } from "express-validator";
+import Stripe from "stripe";
+import verifyToken from "../middleware/auth";
+
+const stripe = new Stripe(process.env.STRIPE_API_KEY as string);
 
 const router = express.Router();
 
@@ -87,6 +91,110 @@ router.get(
     } catch (error) {
       console.log(errors);
       res.status(500).json({ message: "Error fetching hotel" });
+    }
+  }
+);
+
+router.post(
+  "/:hotelId/bookings/payment-intent",
+  verifyToken,
+  async (req: Request, res: Response) => {
+    // 1. totalCost
+    // 2. hotelId
+    // 3. userId
+
+    const { numberOfNights } = req.body;
+    const hotelId = req.params.hotelId;
+
+    const hotel = await Hotel.findById(hotelId);
+
+    if (!hotel) {
+      return res.status(400).json({ message: "Hotel not found" });
+    }
+
+    // it is good to calculate totalCost in backend, cuz if the price
+    // in the backend changes in the background. it will automatically
+    // reflect that
+    const totalCost = hotel.pricePerNight * numberOfNights;
+
+    // paymentIntent is like an invoice creation
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(totalCost * 100), // Convert USD to cents
+      currency: "usd",
+      // associating the payment with the booked hotelId, userId
+      // hepls in analytics and also to check if booking has been paid
+      // for successfully before we save it to the database
+      metadata: {
+        hotelId,
+        userId: req.userId,
+      },
+    });
+
+    if (!paymentIntent.client_secret) {
+      return res
+        .status(500)
+        .json({ message: "Error creating payment intents" });
+    }
+
+    const response = {
+      // paymentIntentId is used to initialize some stripe frontend elements
+      paymentIntentId: paymentIntent.id,
+      clientSecret: paymentIntent.client_secret.toString(),
+      totalCost,
+    };
+
+    res.send(response);
+  }
+);
+
+router.post(
+  "/:hotelId/bookings",
+  verifyToken,
+  async (req: Request, res: Response) => {
+    try {
+      const paymentIntentId = req.body.paymentIntentId;
+      const paymentIntent = await stripe.paymentIntents.retrieve(
+        paymentIntentId as string
+      );
+      if (!paymentIntent) {
+        return res.status(400).json({ message: "Payment intent not found" });
+      }
+
+      // Data Integrity: Metadata in the payment intent ensures that payments are correctly associated with the booking.
+      if (
+        paymentIntent.metadata.hotelId !== req.params.hotelId ||
+        paymentIntent.metadata.userId !== req.userId
+      ) {
+        return res.status(400).json({ message: "Payment intent mismatch" });
+      }
+
+      if (paymentIntent.status !== "succeeded") {
+        return res.status(400).json({
+          message: `Payment intent not succeeded. Status: ${paymentIntent.status}`,
+        });
+      }
+
+      const newBooking: BookingType = {
+        ...req.body,
+        userId: req.userId,
+      };
+
+      const hotel = await Hotel.findOneAndUpdate(
+        { _id: req.params.hotelId },
+        {
+          $push: { bookings: newBooking },
+        }
+      );
+
+      if (!hotel) {
+        return res.status(400).json({ message: "Hotel not found" });
+      }
+
+      await hotel.save();
+      res.status(200).send();
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Something went wrong" });
     }
   }
 );
