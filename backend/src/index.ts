@@ -6,6 +6,7 @@ import userRoutes from "./routes/users";
 import authRoutes from "./routes/auth";
 import myHotelRoutes from "./routes/my-hotels";
 import hotelRoutes from "./routes/hotels";
+import bookingRoutes from "./routes/my-bookings";
 import cookieParser from "cookie-parser";
 import path from "path";
 import configureExternalServices from "./config";
@@ -46,6 +47,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/my-hotels", myHotelRoutes);
 app.use("/api/hotels", hotelRoutes);
+app.use("/api/my-bookings", bookingRoutes);
 
 // Catch all route apart from above routes - this is added so that, dynamic protected routes can be served - tt's necessary as in build itself
 // all components will be bundled, even if conditional components are there.

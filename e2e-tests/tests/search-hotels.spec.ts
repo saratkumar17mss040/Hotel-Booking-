@@ -40,7 +40,7 @@ test("Should book hotel", async ({ page }) => {
 
   await page.getByPlaceholder("Check-out Date").fill(formattedDate);
   await page.getByRole("button", { name: "Search" }).click();
-  await page.getByRole("button", { name: "Search" }).click();
+  // await page.getByRole("button", { name: "Search" }).click();
   await page.getByText("Test hotel").first().click();
   await expect(page).toHaveURL(/detail/);
   await page.getByRole("button", { name: "Book now" }).click();
@@ -56,4 +56,7 @@ test("Should book hotel", async ({ page }) => {
 
   await page.getByRole("button", { name: "Confirm Booking" }).click();
   await expect(page.getByText("Booking Saved!")).toBeVisible();
+
+  await page.getByRole("link", { name: "My Bookings" }).click();
+  await expect(page.getByText("Test hotel")).toBeVisible();
 });
